@@ -34,17 +34,7 @@ class AN_Webadminpanel extends CI_Controller
 	function __construct($idformini = "dashboard")
 	{
 		parent::__construct();
-		$this->dataLabel = [
-			"admin-panel" => [
-				"footerKiri" => "Sistem Informasi Simpan Kegiatan",
-				"footerKiriLink" => "#",
-				"footerKanan" => "",
-				"footerKananBy" => "Skripsi UNIPDU",
-				"footerKananTahun" => "2022",
-				"headeLogo" => "",
-			],
-			"public" => [],
-		];
+		$this->dataLabel = dtLabels();
 		
 		$aksesPetugas = ['thisFrmDashboard', 'thisFrmJabatan', 'thisFrmAgenda', 'thisFrmBiodata'];
 		$aksesSuperdmin = ['dashboard', 'thisFrmBiodata', 'thisFrmLembaga', 'thisFrmJabatan', 'thisFrmDashboard', 'thisFrmAkses', 'thisFrmAgenda'];
@@ -67,7 +57,7 @@ class AN_Webadminpanel extends CI_Controller
 		$this->load->view('headerv', $data, true);
 	}
 	
-	public function cekHakakses($thisFrm,$jenis, $url='admin/dashboard')
+	public function cekHakakses($thisFrm, $jenis, $url = 'admin/dashboard')
 	{
 		$dtHakakses = [
 			"petugas" => [
@@ -82,7 +72,7 @@ class AN_Webadminpanel extends CI_Controller
 			],
 		];
 		$level = $this->session->userdata('session_level');
-		if (!$dtHakakses[$level][$thisFrm][$jenis]){
+		if (!$dtHakakses[$level][$thisFrm][$jenis]) {
 			$this->session->set_flashdata('notifikasi', jsHandlerCustom("Anda tidak memiliki akses $jenis data $thisFrm", false));
 			redirect($url);
 			exit();
@@ -91,8 +81,10 @@ class AN_Webadminpanel extends CI_Controller
 	
 	private function cekIdAkses($id)
 	{
+		$CI = self::get_instance();
 		$sql = "SELECT * FROM akses WHERE id='$id'";
-		$cek = cektabelsql($sql);
+		$cek = $this->db->query($sql);
+		$cek = $cek->result_array();
 		if (!$cek) {
 			session_destroy();
 			if ($this->input->get('__') !== null) {
@@ -120,12 +112,12 @@ class AN_Webadminpanel extends CI_Controller
 		return $hLembaga;
 	}
 	
-	public function getBiodata($idLembaga = '', $jenis='', $idBiodata='')
+	public function getBiodata($idLembaga = '', $jenis = '', $idBiodata = '')
 	{
 		$dtTabel = $this->Mbiodata->getDataRelasi($idLembaga);
 		
 		$h = "";
-		if ($jenis=='select'){
+		if ($jenis == 'select') {
 			foreach ($dtTabel as $l) {
 				$chec = '';
 				if ($idBiodata == $l['id']) {
@@ -133,7 +125,7 @@ class AN_Webadminpanel extends CI_Controller
 				}
 				$h .= "<option $chec value=\"" . $l['id'] . "\">$l[nama] __ $l[nama_jabatan]</option>";
 			}
-		}else{
+		} else {
 		}
 		
 		return $h;

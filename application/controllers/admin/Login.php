@@ -3,7 +3,9 @@ defined('BASEPATH') or exit('No direct script access allowed');
 
 class Login extends CI_Controller
 {
-	// metode yang pertama kali dijalankan
+	public $dataLabel;
+
+// metode yang pertama kali dijalankan
 	public function __construct()
 	{
 		parent::__construct();
@@ -13,6 +15,9 @@ class Login extends CI_Controller
 			redirect('admin/dashboard');
 			exit();
 		}
+		$this->dataLabel = dtLabels();
+		$data['labels'] = $this->dataLabel;
+		$this->load->view('headerv', $data, true);
 	}
 	
 	public function index()

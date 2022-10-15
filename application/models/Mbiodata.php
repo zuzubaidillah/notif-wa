@@ -3,7 +3,7 @@ defined('BASEPATH') or exit('No direct script access allowed');
 
 class Mbiodata extends CI_Model
 {
-	public function getData($idLembaga='')
+	public function getData($idLembaga = '')
 	{
 		$sql = "SELECT * FROM biodata $where ORDER BY nama ASC";
 		$querySql = $this->db->query($sql);
@@ -11,14 +11,32 @@ class Mbiodata extends CI_Model
 		return $querySql->result_array();
 	}
 	
-	public function getDataRelasi($idLembaga='')
+	public function getDataRelasiSesuaiIdBiodata($idBiodata)
+	{
+		$sql = "SELECT
+		    bio.*,
+		    lem.nama as nama_lembaga,
+		    jbt.nama as nama_jabatan
+		FROM
+		    biodata bio
+		INNER JOIN jabatan jbt ON
+		    bio.id_jabatan = jbt.id
+		INNER JOIN lembaga lem ON
+		    bio.id_lembaga = lem.id WHERE bio.id='$idBiodata'
+		    ORDER BY bio.nama ASC, jbt.nama ASC, lem.nama ASC;";
+		$querySql = $this->db->query($sql);
+		
+		return $querySql->result_array();
+	}
+	
+	public function getDataRelasi($idLembaga = '')
 	{
 		$level = cek_level();
 		$where = '';
-		if ($idLembaga!=''){
+		if ($idLembaga != '') {
 			$where = "WHERE id_lembaga='$idLembaga'";
-		}else{
-			if ($level=='petugas'){
+		} else {
+			if ($level == 'petugas') {
 				$idLembaga = $this->Mbiodata->cekId(ambil_user())[0]['id_lembaga'];
 				$where = "WHERE bio.id_lembaga='$idLembaga'";
 			}
@@ -80,8 +98,8 @@ class Mbiodata extends CI_Model
 		$sql = "SELECT * FROM biodata bio inner join agenda age on bio.id=age.id_biodata WHERE id!='$nilai'";
 		$query = $this->db->query($sql);
 		$hasil = $query->result_array();
-		if (count($hasil)>=1){
-			$this->session->set_flashdata('notifikasi', jsHandlerCustom('Maaf, data sudah digunakan di Agenda.',false));
+		if (count($hasil) >= 1) {
+			$this->session->set_flashdata('notifikasi', jsHandlerCustom('Maaf, data sudah digunakan di Agenda.', false));
 			redirect('admin/biodata');
 			exit();
 		}
