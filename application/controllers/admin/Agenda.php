@@ -71,7 +71,7 @@ class Agenda extends AN_Webadminpanel
 		$data['waktu'] = date("Y-m-d", strtotime($cek[0]['waktu']));
 		$data['jam'] = date("H:i", strtotime($cek[0]['waktu']));
 		$data['durasi'] = $cek[0]['menit_sebelum_notif'];
-		$data['notif_ke'] = $cek[0]['notif_ke'];
+		$data['notifKe'] = $cek[0]['notif_ke'];
 		$data['id_biodata'] = $cek[0]['id_biodata'];
 		
 		$data['hPu'] = ($cek[0]['jenis_agenda'] == 'private' ? '' : 'checked');

@@ -58,6 +58,12 @@
 										$jenis_agenda = $v['jenis_agenda'];
 										$nama_lembaga = $v['nama_lembaga'];
 										$id_biodata = $v['id_biodata'];
+										$status = $v['status'];
+										if ($status < 0) {
+											$formatStatus = ' <span class="text-success pl-3">selesai</span>';
+										} else {
+											$formatStatus = ' <span class="text-warning pl-3">menunggu</span>';
+										}
 										$nama_pengguna = "<a href=\"" . base_url('admin/biodata/detail/' . $id_biodata) . "\">$v[nama_pengguna]</a>";
 										// $hasilStyle = "background: #f25961!important;color: #fff!important;";
 										$hasilStyle = "";
@@ -65,11 +71,10 @@
 										<tr style="<?= $hasilStyle ?>">
 											<td><?= ++$no ?></td>
 											<td>
-												<b><?= $dari ?></b> <br>
+												<b><?= $dari ?></b> <?= $formatStatus ?><br>
 												<?= $waktu ?> -- <?= $menit_sebelum_notif ?>jam
 											</td>
 											<td>
-												<?= $dari ?> <br>
 												Notif ke : <?= $notif_ke ?> <br>
 												Sifat: <?= $jenis_agenda ?>
 											</td>

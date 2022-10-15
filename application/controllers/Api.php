@@ -13,10 +13,14 @@ class Api extends CI_Controller
 		exit();
 	}
 	
-	public function cekAgenda()
+	public function cekAgenda($getId = '')
 	{
-		$tgl = datetime_sendiri();
-		$cek = $this->Magenda->cekAgenda($tgl);
+		if ($getId == '') {
+			$tgl = datetime_sendiri();
+			$cek = $this->Magenda->cekAgenda($tgl);
+		} else {
+			$cek = $this->Magenda->getDataRelasi($getId);
+		}
 		if (count($cek) == 0) {
 			$res = res_error(null, 'Berhasil', 'Tidak Ditemukan Agenda');
 			http_response_code($res['code']);
@@ -25,6 +29,16 @@ class Api extends CI_Controller
 		}
 		$row = [];
 		foreach ($cek as $l) {
+			if ($l['status'] <= 0) {
+				if ($getId == '') {
+					$row[] = 409;
+					continue;
+				} else {
+					$this->session->set_flashdata('notifikasi', jsHandlerCustom('Maaf Agenda Sudah Selesai.', false));
+					redirect('admin/agenda/update/' . $getId);
+					exit();
+				}
+			}
 			$tgl = tgl_indo($l['waktu']);
 			$jam = format_time($l['waktu']);
 			$pesan = <<<PESAN
@@ -46,20 +60,43 @@ PESAN;
 			$resApi = format_api("http://103.163.226.154:8001/kirimpesan", $data, 'POST');
 			$row[] = $resApi[1];
 			if ($resApi[1] == 200) {
+				if ($getId != '') {
+					$jml = $l['notif_ke'] + 1;
+				} else {
+					$jml = 0;
+				}
 				$update = [
-					"notif_ke" => 1
+					"notif_ke" => $jml
 				];
 				$this->Makses->update('agenda', $update, 'id', $l['id']);
 			}
 		}
-		$res = res_success([$cek, $tgl, $row], '', '');
-		http_response_code($res['code']);
-		echo json_encode($res);
-		exit();
+		if ($getId == '') {
+			$res = res_success([$cek, $tgl, $row], '', '');
+			http_response_code($res['code']);
+			echo json_encode($res);
+			exit();
+		} else {
+			return $resApi[1];
+		}
 	}
 	
-	private function kirimWa()
+	public function kirimwaidagenda($id = '0')
 	{
-		return true;
+		if ($id == '0') {
+			$this->session->set_flashdata('notifikasi', jsHandlerIdKosong());
+			redirect('admin/agenda');
+			exit();
+		}
+		$has = $this->cekAgenda($id);
+		if ($has == 200) {
+			$this->session->set_flashdata('notifikasi', jsHandlerCustom('Berhasil Terkirim', true));
+			redirect('admin/agenda/update/' . $id);
+			exit();
+		} else {
+			$this->session->set_flashdata('notifikasi', jsHandler('u', false));
+			redirect('admin/agenda/update/' . $id);
+			exit();
+		}
 	}
 }

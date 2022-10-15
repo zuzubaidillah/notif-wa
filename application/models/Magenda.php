@@ -11,7 +11,7 @@ class Magenda extends CI_Model
 		return $querySql->result_array();
 	}
 	
-	public function getDataRelasi()
+	public function getDataRelasi($id = '')
 	{
 		$level = $this->session->userdata('session_level');
 		$where = "";
@@ -20,10 +20,22 @@ class Magenda extends CI_Model
 			$idLembaga = $this->Mbiodata->cekId($idBiodata)[0]['id_lembaga'];
 			$where = "AND bio.id_lembaga='$idLembaga'";
 		}
+		if ($id != '') {
+			$where = "AND age.id='$id'";
+		}
+		$tgl = datetime_sendiri();
 		$sql = "SELECT
 		    age.*,
 		    bio.nama as nama_pengguna,
-		    lem.nama as nama_lembaga
+		    bio.no_telp as nomor_wa,
+		    lem.nama as nama_lembaga,
+		    (
+		        TIMESTAMPDIFF(
+		            HOUR,
+		            '$tgl',
+		            age.waktu
+		        )
+		    ) as status
 		FROM
 		    agenda age
 		INNER JOIN biodata bio ON
@@ -104,7 +116,14 @@ class Magenda extends CI_Model
 		    age.*,
 		    bio.nama AS nama_pengguna,
 		    bio.no_telp AS nomor_wa,
-		    lem.nama AS nama_lembaga
+		    lem.nama AS nama_lembaga,
+		    (
+		        TIMESTAMPDIFF(
+		            HOUR,
+		            '$tgl',
+		            age.waktu
+		        )
+		    ) as status
 		FROM
 		    agenda age
 		INNER JOIN biodata bio ON
@@ -112,7 +131,7 @@ class Magenda extends CI_Model
 		INNER JOIN lembaga lem ON
 		    bio.id_lembaga = lem.id
 		WHERE
-		    age.waktu >= '$tgl' AND(
+		    age.waktu >= '$tgl' AND (
 		        TIMESTAMPDIFF(
 		            HOUR,
 		            '$tgl',

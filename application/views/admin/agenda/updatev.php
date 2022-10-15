@@ -87,10 +87,13 @@
 												<label for="durasi">Durasi Pengingat, Sebelum kegiatan</label>
 												<input value="<?= $durasi ?>" required maxlength="5" type="number" class="form-control" id="durasi" name="durasi" placeholder="isikan durasi perdetik">
 												<small class="form-text text-muted">*note: perjam</small>
+												<small class="form-text text-muted">*NOTIF: <?= $notifKe ?></small>
 											</div>
 
 											<div class="form-group">
 												<button class="btn btn-primary" id="btnSimpan" type="submit">Simpan</button>
+												<a class="btn btn-warning" href="<?= base_url('api/kirimwaidagenda/' . $id) ?>">Kirim
+													Ulang</a>
 											</div>
 										</div>
 									</div>
