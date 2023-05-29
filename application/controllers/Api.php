@@ -12,7 +12,7 @@ class Api extends CI_Controller
 		echo json_encode($res);
 		exit();
 	}
-	
+
 	public function cekAgenda($getId = '')
 	{
 		if ($getId == '') {
@@ -29,7 +29,7 @@ class Api extends CI_Controller
 		}
 		$row = [];
 		foreach ($cek as $l) {
-			if ($l['status'] <= 0) {
+			if ($l['status'] < 0) {
 				if ($getId == '') {
 					$row[] = 409;
 					continue;
@@ -52,19 +52,20 @@ keterangan: $l[deskripsi]
 
 Pesan ini tidak perlu dibalas, otomatis oleh sistem
 PESAN;
-			
+
 			$data = [
 				"pesan" => $pesan,
-				"nomor" => $l['nomor_wa'],
+				"target" => $l['nomor_wa'],
 			];
-			$resApi = format_api("http://103.163.226.154:8001/kirimpesan", $data, 'POST');
-			$row[] = $resApi[1];
+			$resApi = format_api("http://103.163.226.154:30022/kirimpesan", $data, 'POST');
+			$row[0] = $resApi[0];
+			$row[1] = $resApi[1];
 			if ($resApi[1] == 200) {
-				if ($getId != '') {
-					$jml = $l['notif_ke'] + 1;
-				} else {
-					$jml = 0;
-				}
+				// if ($getId == '') {
+				// } else {
+				// 	$jml = 0;
+				// }
+				$jml = $l['notif_ke'] + 1;
 				$update = [
 					"notif_ke" => $jml
 				];
@@ -80,7 +81,7 @@ PESAN;
 			return $resApi[1];
 		}
 	}
-	
+
 	public function kirimwaidagenda($id = '0')
 	{
 		if ($id == '0') {

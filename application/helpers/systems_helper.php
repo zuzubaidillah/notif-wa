@@ -2,10 +2,10 @@
 defined('BASEPATH') or exit('No direct script access allowed');
 if (!function_exists('systems')) {
 	
-	function format_api($url = "http://103.163.226.154:8001/kirimpesan", $data = [], $methode = 'GET', $headers = '')
+	function format_api($url = "http://103.163.226.154:30022/kirimpesan", $data = [], $methode = 'GET', $headers = '')
 	{
 		$handle = curl_init();
-		curl_setopt($handle, CURLOPT_URL, $url);
+		curl_setopt($handle, CURLOPT_URL, "http://103.163.226.154:30021/kirimpesan");
 		curl_setopt($handle, CURLOPT_POST, true);
 		curl_setopt($handle, CURLOPT_RETURNTRANSFER, true);
 		
