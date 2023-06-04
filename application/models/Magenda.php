@@ -146,17 +146,8 @@ class Magenda extends CI_Model
 
 	public function delete($nilai)
 	{
-		$sql = "SELECT * FROM agenda bio inner join agenda age on bio.id=age.id_biodata WHERE bio.id='$nilai'";
-		$query = $this->db->query($sql);
-		$hasil = $query->result_array();
-		if (count($hasil) >= 1) {
-			$this->session->set_flashdata('notifikasi', jsHandlerCustom('Maaf, data sudah digunakan di Agenda.', false));
-			redirect('admin/biodata');
-			exit();
-		}
-
 		$this->db->where('id', $nilai);
-		$this->db->delete('biodata');
+		$this->db->delete('agenda');
 		return $this->db->affected_rows(); // 0 atau 1
 	}
 }

@@ -89,7 +89,7 @@ $autoload['drivers'] = array();
 |
 |	$autoload['helper'] = array('url', 'file');
 */
-$autoload['helper'] = array('url','Systems','Handler', 'AN_fungsi');
+$autoload['helper'] = array('url', 'Systems', 'Handler', 'AN_fungsi');
 
 /*
 | -------------------------------------------------------------------
@@ -132,4 +132,4 @@ $autoload['language'] = array();
 |
 |	$autoload['model'] = array('first_model' => 'first');
 */
-$autoload['model'] = array('Makses','Mlembaga','Mjabatan','Mbiodata','Magenda');
+$autoload['model'] = array('Makses', 'Mlembaga', 'Mjabatan', 'Mbiodata', 'Magenda');
