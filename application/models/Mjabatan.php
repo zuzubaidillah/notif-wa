@@ -31,7 +31,7 @@ class Mjabatan extends CI_Model
 
 	public function delete($nilai)
 	{
-		$sql = "SELECT * FROM jabatan jab inner join biodata bio on jab.id=bio.id_jabatan WHERE jab.id!='$nilai'";
+		$sql = "SELECT * FROM jabatan jab inner join biodata bio on jab.id=bio.id_jabatan WHERE jab.id='$nilai'";
 		$query = $this->db->query($sql);
 		$hasil = $query->result_array();
 		if (count($hasil) >= 1) {
