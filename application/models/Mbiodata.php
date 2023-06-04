@@ -7,10 +7,10 @@ class Mbiodata extends CI_Model
 	{
 		$sql = "SELECT * FROM biodata $where ORDER BY nama ASC";
 		$querySql = $this->db->query($sql);
-		
+
 		return $querySql->result_array();
 	}
-	
+
 	public function getDataRelasiSesuaiIdBiodata($idBiodata)
 	{
 		$sql = "SELECT
@@ -25,10 +25,10 @@ class Mbiodata extends CI_Model
 		    bio.id_lembaga = lem.id WHERE bio.id='$idBiodata'
 		    ORDER BY bio.nama ASC, jbt.nama ASC, lem.nama ASC;";
 		$querySql = $this->db->query($sql);
-		
+
 		return $querySql->result_array();
 	}
-	
+
 	public function getDataRelasi($idLembaga = '')
 	{
 		$level = cek_level();
@@ -53,24 +53,24 @@ class Mbiodata extends CI_Model
 		    bio.id_lembaga = lem.id $where
 		    ORDER BY bio.nama ASC, jbt.nama ASC, lem.nama ASC;";
 		$querySql = $this->db->query($sql);
-		
+
 		return $querySql->result_array();
 	}
-	
+
 	public function cekId($id)
 	{
 		$sql = "SELECT * FROM biodata WHERE id='$id'";
 		$query = $this->db->query($sql);
 		return $query->result_array();
 	}
-	
+
 	public function cekAktif($id)
 	{
 		$sql = "SELECT aktif FROM biodata WHERE id='$id' AND aktif='aktif'";
 		$query = $this->db->query($sql);
 		return $query->result_array();
 	}
-	
+
 	public function cekNama($n, $id = '')
 	{
 		if ($id == '') {
@@ -81,7 +81,7 @@ class Mbiodata extends CI_Model
 		$query = $this->db->query($sql);
 		return $query->result_array();
 	}
-	
+
 	public function cekNamaDiLembagaSama($n, $lembaga, $id = '')
 	{
 		if ($id == '') {
@@ -92,10 +92,10 @@ class Mbiodata extends CI_Model
 		$query = $this->db->query($sql);
 		return $query->result_array();
 	}
-	
+
 	public function delete($nilai)
 	{
-		$sql = "SELECT * FROM biodata bio inner join agenda age on bio.id=age.id_biodata WHERE id!='$nilai'";
+		$sql = "SELECT * FROM biodata bio inner join agenda age on bio.id=age.id_biodata WHERE bio.id!='$nilai'";
 		$query = $this->db->query($sql);
 		$hasil = $query->result_array();
 		if (count($hasil) >= 1) {
@@ -103,7 +103,7 @@ class Mbiodata extends CI_Model
 			redirect('admin/biodata');
 			exit();
 		}
-		
+
 		$this->db->where('id', $nilai);
 		$this->db->delete('biodata');
 		return $this->db->affected_rows(); // 0 atau 1

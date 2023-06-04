@@ -7,10 +7,10 @@ class Magenda extends CI_Model
 	{
 		$sql = "SELECT * FROM agenda ORDER BY nama ASC";
 		$querySql = $this->db->query($sql);
-		
+
 		return $querySql->result_array();
 	}
-	
+
 	public function getDataRelasi($id = '')
 	{
 		$level = $this->session->userdata('session_level');
@@ -44,10 +44,10 @@ class Magenda extends CI_Model
 		    bio.id_lembaga = lem.id $where
 		    ORDER BY bio.nama ASC";
 		$querySql = $this->db->query($sql);
-		
+
 		return $querySql->result_array();
 	}
-	
+
 	public function hitungAgenda()
 	{
 		$level = $this->session->userdata('session_level');
@@ -75,18 +75,18 @@ class Magenda extends CI_Model
 		        agenda age $whereSelesai
 		) AS selesai;";
 		$querySql = $this->db->query($sql);
-		
+
 		return $querySql->result_array();
 	}
-	
+
 	public function cekId($id)
 	{
 		$sql = "SELECT * FROM agenda WHERE id='$id'";
-		
+
 		$query = $this->db->query($sql);
 		return $query->result_array();
 	}
-	
+
 	public function cekNama($n, $id = '')
 	{
 		if ($id == '') {
@@ -97,7 +97,7 @@ class Magenda extends CI_Model
 		$query = $this->db->query($sql);
 		return $query->result_array();
 	}
-	
+
 	public function cekNamaDiLembagaSama($n, $lembaga, $id = '')
 	{
 		if ($id == '') {
@@ -108,7 +108,7 @@ class Magenda extends CI_Model
 		$query = $this->db->query($sql);
 		return $query->result_array();
 	}
-	
+
 	public function cekAgenda($tgl)
 	{
 		// $tgl = datetime_sendiri();
@@ -143,10 +143,10 @@ class Magenda extends CI_Model
 		$query = $this->db->query($sql);
 		return $query->result_array();
 	}
-	
+
 	public function delete($nilai)
 	{
-		$sql = "SELECT * FROM agenda bio inner join agenda age on bio.id=age.id_biodata WHERE id!='$nilai'";
+		$sql = "SELECT * FROM agenda bio inner join agenda age on bio.id=age.id_biodata WHERE bio.id!='$nilai'";
 		$query = $this->db->query($sql);
 		$hasil = $query->result_array();
 		if (count($hasil) >= 1) {
@@ -154,7 +154,7 @@ class Magenda extends CI_Model
 			redirect('admin/biodata');
 			exit();
 		}
-		
+
 		$this->db->where('id', $nilai);
 		$this->db->delete('biodata');
 		return $this->db->affected_rows(); // 0 atau 1
