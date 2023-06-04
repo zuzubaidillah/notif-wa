@@ -1,5 +1,6 @@
 <?php
 defined('BASEPATH') or exit('No direct script access allowed');
+date_default_timezone_set("Asia/Jakarta");
 
 class Login extends CI_Controller
 {
@@ -19,7 +20,7 @@ class Login extends CI_Controller
 		$data['labels'] = $this->dataLabel;
 		$this->load->view('headerv', $data, true);
 	}
-	
+
 	public function index()
 	{
 		// cek tabel user
@@ -29,13 +30,13 @@ class Login extends CI_Controller
 		}
 		$data['head_title'] = "Login";
 		$data['body_label_content'] = "Login";
-		
+
 		$this->load->view('headerv', $data);
 		$this->load->view('admin/menuv');
 		$this->load->view('admin/loginv');
 		$this->load->view('footerv');
 	}
-	
+
 	public function registrasi()
 	{
 		// cek tabel user
@@ -43,16 +44,16 @@ class Login extends CI_Controller
 		// if (count($cek) >= 1) {
 		// 	redirect('admin/login');
 		// }
-		
+
 		$data['head_title'] = "Registrasi";
 		$data['body_label_content'] = $data['head_title'];
-		
+
 		$this->load->view('headerv', $data);
 		$this->load->view('admin/menuv');
 		$this->load->view('admin/registrasiv');
 		$this->load->view('footerv');
 	}
-	
+
 	public function proses_registrasi()
 	{
 		// mengambil nilai yang dikirim
@@ -61,7 +62,7 @@ class Login extends CI_Controller
 		$nd = htmlspecialchars($this->input->post('nama'), ENT_QUOTES);
 		$passwordEncript = password_hash($p, PASSWORD_DEFAULT);
 		$id = mt_rand(100000, 999999);
-		
+
 		// data disimpan
 		$dtSimpan = [
 			"id" => $id,
@@ -79,16 +80,16 @@ class Login extends CI_Controller
 		}
 		http_response_code(400);
 	}
-	
+
 	public function proses_login()
 	{
 		// menerima inputan dari bagian view
 		$idAkses = htmlspecialchars($this->input->post('u'), ENT_QUOTES);
 		$p = htmlspecialchars($this->input->post('p'), ENT_QUOTES);
-		
+
 		// cek username
 		$cekUser = $this->Makses->cekUsername($idAkses);
-		
+
 		// percabangan, 
 		if (count($cekUser) == 0) {
 			$res = res_error('', 'Gagal', 'Username salah!');
@@ -96,7 +97,7 @@ class Login extends CI_Controller
 			echo json_encode($res);
 			exit();
 		}
-		
+
 		if (password_verify($p, $cekUser[0]['password'])) {
 			if ($cekUser[0]['level'] == 'petugas') {
 				$cekAktif = $this->Mbiodata->cekAktif($cekUser[0]['id']);
@@ -113,7 +114,7 @@ class Login extends CI_Controller
 				"session_level" => $cekUser[0]['level']
 			];
 			$this->session->set_userdata($ses);
-			
+
 			$res = res_success('', 'Berhasil', 'Proses Validasi Sesuai');
 			http_response_code($res['code']);
 			echo json_encode($res);

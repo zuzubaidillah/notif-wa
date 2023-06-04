@@ -2,12 +2,13 @@
 defined('BASEPATH') or exit('No direct script access allowed');
 
 header('Content-Type: Application/json');
+date_default_timezone_set("Asia/Jakarta");
 
 class Api extends CI_Controller
 {
 	public function index()
 	{
-		$res = res_custom('', '', '', 500);
+		$res = res_custom('', '', '', 500, "");
 		http_response_code($res['code']);
 		echo json_encode($res);
 		exit();
@@ -57,7 +58,7 @@ PESAN;
 				"pesan" => $pesan,
 				"target" => $l['nomor_wa'],
 			];
-			$resApi = format_api("http://103.163.226.154:30022/kirimpesan", $data, 'POST');
+			$resApi = format_api("http://103.163.226.146:30022/kirimpesan", $data, 'POST');
 			$row[0] = $resApi[0];
 			$row[1] = $resApi[1];
 			if ($resApi[1] == 200) {

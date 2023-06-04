@@ -42,7 +42,7 @@ class Magenda extends CI_Model
 		    age.id_biodata = bio.id
 		INNER JOIN lembaga lem ON
 		    bio.id_lembaga = lem.id $where
-		    ORDER BY bio.nama ASC";
+		    ORDER BY age.waktu DESC,bio.nama ASC";
 		$querySql = $this->db->query($sql);
 
 		return $querySql->result_array();

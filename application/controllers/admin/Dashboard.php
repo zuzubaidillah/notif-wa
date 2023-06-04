@@ -1,5 +1,6 @@
 <?php
 defined('BASEPATH') or exit('No direct script access allowed');
+date_default_timezone_set("Asia/Jakarta");
 
 class Dashboard extends AN_Webadminpanel
 {
@@ -8,7 +9,7 @@ class Dashboard extends AN_Webadminpanel
 	{
 		parent::__construct('thisFrmDashboard');
 	}
-	
+
 	public function index()
 	{
 		$data['head_title'] = "Dashboard";
@@ -23,7 +24,7 @@ class Dashboard extends AN_Webadminpanel
 		$data['jsHitungAgendaMenunggu'] = $men;
 		$data['jsHitungAgendaSelesai'] = $sel;
 		$data['jsHitungAgendaAll'] = $tot;
-		
+
 		$this->load->view('headerv', $data);
 		$this->load->view('admin/menuv');
 		$this->load->view('admin/dashboardv');
