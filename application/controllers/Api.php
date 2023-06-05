@@ -58,7 +58,7 @@ PESAN;
 				"pesan" => $pesan,
 				"target" => $l['nomor_wa'],
 			];
-			$resApi = format_api("http://103.163.226.146:30022/kirimpesan", $data, 'POST');
+			$resApi = format_api("", $data, 'POST');
 			$row[0] = $resApi[0];
 			$row[1] = $resApi[1];
 			if ($resApi[1] == 200) {

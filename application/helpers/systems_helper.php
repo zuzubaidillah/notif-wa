@@ -1,58 +1,58 @@
 <?php
 defined('BASEPATH') or exit('No direct script access allowed');
 if (!function_exists('systems')) {
-	
-	function format_api($url = "http://103.163.226.154:30022/kirimpesan", $data = [], $methode = 'GET', $headers = '')
+
+	function format_api($url = "", $data = [], $methode = 'GET', $headers = '')
 	{
 		$handle = curl_init();
-		curl_setopt($handle, CURLOPT_URL, "http://103.163.226.154:30021/kirimpesan");
+		curl_setopt($handle, CURLOPT_URL, "http://103.163.226.146:30021/kirimpesan");
 		curl_setopt($handle, CURLOPT_POST, true);
 		curl_setopt($handle, CURLOPT_RETURNTRANSFER, true);
-		
+
 		curl_setopt($handle, CURLOPT_HTTPHEADER, [
 			'Content-Type: application/x-www-form-urlencoded',
 		]);
-		
+
 		curl_setopt($handle, CURLOPT_POSTFIELDS, http_build_query($data));
-		
+
 		//for debug only!
 		curl_setopt($handle, CURLOPT_SSL_VERIFYHOST, false);
 		curl_setopt($handle, CURLOPT_SSL_VERIFYPEER, false);
-		
+
 		$resp = curl_exec($handle);
 		$httpcode = curl_getinfo($handle, CURLINFO_HTTP_CODE);
-		
+
 		curl_close($handle);
 		return [$resp, $httpcode];
 	}
-	
+
 	function link_api_v1($url = '')
 	{
 		$s = "http://103.163.226.154:8001/kirimpesan";
 		return $s;
 	}
-	
+
 	function datetime_sendiri()
 	{
 		date_default_timezone_set("Asia/Jakarta");
 		$tgl = date('Y-m-d H:i:s');
 		return $tgl;
 	}
-	
+
 	function date_sendiri()
 	{
 		date_default_timezone_set("Asia/Jakarta");
 		$tgl = date('Y-m-d');
 		return $tgl;
 	}
-	
+
 	function jam_sendiri()
 	{
 		date_default_timezone_set("Asia/Jakarta");
 		$tgl = date('H:i:s');
 		return $tgl;
 	}
-	
+
 	function dtLabels()
 	{
 		$h = [
@@ -68,7 +68,7 @@ if (!function_exists('systems')) {
 		];
 		return $h;
 	}
-	
+
 	function dtMenu()
 	{
 		$dtMenu = [
@@ -147,11 +147,11 @@ if (!function_exists('systems')) {
 		];
 		return $dtMenu;
 	}
-	
+
 	function buat_id($key, $table, $panjang = 0)
 	{
 		$CI = &get_instance();
-		
+
 		if ($panjang == 0) {
 			$id = round(microtime(true) * 1000);
 		} else {
@@ -167,11 +167,11 @@ if (!function_exists('systems')) {
 		}
 		return $id;
 	}
-	
+
 	function ambil_user()
 	{
 		$CI = &get_instance();
-		
+
 		$user = $CI->Makses->ambiluser();
 		if (count($user) >= 1) {
 			$user = $user[0]['id'];
@@ -181,7 +181,7 @@ if (!function_exists('systems')) {
 			exit();
 		}
 	}
-	
+
 	function cek_validasi($data = [], $methode = 'POST')
 	{
 		$CI = &get_instance();
@@ -197,7 +197,7 @@ if (!function_exists('systems')) {
 			}
 		}
 	}
-	
+
 	function array_to_keterangan($data = [], $metod = 'tanpa tabel', $jenis = 'log')
 	{
 		$CI = &get_instance();
@@ -213,7 +213,7 @@ if (!function_exists('systems')) {
 			$kk = str_replace("'", ' ', $k_slug);
 			$k = str_replace("-", ' ', $kk);
 			$v = str_replace("-", ' ', $vv);
-			
+
 			if ($metod == "tanpa tabel") {
 				$hasil .= "$k: $v, $br";
 			} else {
@@ -222,15 +222,15 @@ if (!function_exists('systems')) {
 		}
 		return $hasil;
 	}
-	
-	
+
+
 	function gettabelsql($tabel, $jenis = 'result')
 	{
 		// menambahakn get_instance() adalah sebuah fungsi yang didefinisikan di file inti dari CodeIgniter. Anda menggunakannya untuk mendapatkan singleton mengacu pada CodeIgniter super objek ketika anda berada dalam lingkup luar super objek.
 		$CI = &get_instance();
-		
+
 		$query = $CI->db->query($tabel);
-		
+
 		if ($query->num_rows() > 0) {
 			if ($jenis == 'result') {
 				return $query->result();
@@ -241,7 +241,7 @@ if (!function_exists('systems')) {
 			return 0;
 		}
 	}
-	
+
 	function cek_level($jenis = 'id_level')
 	{
 		$CI = &get_instance();
@@ -256,13 +256,13 @@ if (!function_exists('systems')) {
 		}
 		return $h;
 	}
-	
+
 	function format_number_wa($nomor)
 	{
 		$CI = &get_instance();
 		$n = " +62 813-0000-0767 ";
 		$n2 = " 0813-123-345-324 ";
-		
+
 		$rep_car = preg_replace('/[^\dxX]/', '', $nomor);
 		// echo $rep_car;
 		// echo "<br>";
@@ -271,10 +271,10 @@ if (!function_exists('systems')) {
 			$rep_nol = ltrim($rep_car, '0');
 			$no = '62' . $rep_nol;
 		}
-		
+
 		return $no;
 	}
-	
+
 	function selisih_time($tanggal, $date_time, $jenis = 'menit')
 	{
 		$tz = new DateTimeZone('Asia/Jakarta');
