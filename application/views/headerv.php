@@ -3,24 +3,24 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-	<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+	<meta http-equiv="X-UA-Compatible" content="IE=edge"/>
 	<title><?= $head_title ?? "Apps Default"; ?></title>
-	<meta content='width=device-width, initial-scale=1.0, shrink-to-fit=no' name='viewport' />
-	<link rel="icon" href="<?= base_url() ?>assets-admin/img/icon.ico" type="image/x-icon" />
+	<meta content='width=device-width, initial-scale=1.0, shrink-to-fit=no' name='viewport'/>
+	<link rel="icon" href="<?= base_url() ?>assets-admin/img/icon.ico" type="image/x-icon"/>
 
 	<!-- Fonts and icons -->
 	<script src="<?= base_url() ?>assets-admin/js/plugin/webfont/webfont.min.js"></script>
 	<script>
-	  WebFont.load({
-		  google: {"families": ["Lato:300,400,700,900"]},
-		  custom: {
-			  "families": ["Flaticon", "Font Awesome 5 Solid", "Font Awesome 5 Regular", "Font Awesome 5 Brands", "simple-line-icons"],
-			  urls: ['<?=base_url()?>assets-admin/css/fonts.min.css']
-		  },
-		  active: function () {
-			  sessionStorage.fonts = true;
-		  }
-	  });
+		WebFont.load({
+			google: {"families": ["Lato:300,400,700,900"]},
+			custom: {
+				"families": ["Flaticon", "Font Awesome 5 Solid", "Font Awesome 5 Regular", "Font Awesome 5 Brands", "simple-line-icons"],
+				urls: ['<?=base_url()?>assets-admin/css/fonts.min.css']
+			},
+			active: function () {
+				sessionStorage.fonts = true;
+			}
+		});
 	</script>
 
 	<!-- CSS Files -->
@@ -35,10 +35,12 @@
 		<!-- Logo Header -->
 		<div class="logo-header" data-background-color="blue">
 
-			<a href="index.html" class="logo">
-				<img src="<?= base_url() ?>assets-admin/img/logo.svg" alt="navbar brand" class="navbar-brand">
+			<a href="index.html" class="logo text-white">
+				<!--<img src="<?php /*= base_url() */ ?>assets-admin/img/logo.svg" alt="navbar brand" class="navbar-brand">-->
+				SKRIPSI
 			</a>
-			<button class="navbar-toggler sidenav-toggler ml-auto" type="button" data-toggle="collapse" data-target="collapse" aria-expanded="false" aria-label="Toggle navigation">
+			<button class="navbar-toggler sidenav-toggler ml-auto" type="button" data-toggle="collapse"
+					data-target="collapse" aria-expanded="false" aria-label="Toggle navigation">
 					<span class="navbar-toggler-icon">
 						<i class="icon-menu"></i>
 					</span>

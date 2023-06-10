@@ -87,17 +87,17 @@ PESAN;
 	{
 		if ($id == '0') {
 			$this->session->set_flashdata('notifikasi', jsHandlerIdKosong());
-			redirect('admin/agenda');
+//			redirect('admin/agenda');
 			exit();
 		}
 		$has = $this->cekAgenda($id);
 		if ($has == 200) {
 			$this->session->set_flashdata('notifikasi', jsHandlerCustom('Berhasil Terkirim', true));
-			redirect('admin/agenda/update/' . $id);
+//			redirect('admin/agenda/update/' . $id);
 			exit();
 		} else {
 			$this->session->set_flashdata('notifikasi', jsHandler('u', false));
-			redirect('admin/agenda/update/' . $id);
+//			redirect('admin/agenda/update/' . $id);
 			exit();
 		}
 	}

@@ -70,6 +70,16 @@ class AN_Webadminpanel extends CI_Controller
 					"public" => 0,
 				],
 			],
+			"superadmin" => [
+				"thisFrmJabatan" => [
+					"create" => 1,
+					"read" => 1,
+					"update" => 1,
+					"delete" => 1,
+					"print" => 1,
+					"public" => 0,
+				],
+			],
 		];
 		$level = $this->session->userdata('session_level');
 		if (!$dtHakakses[$level][$thisFrm][$jenis]) {
