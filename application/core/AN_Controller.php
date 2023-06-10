@@ -3,156 +3,156 @@ defined('BASEPATH') or exit('No direct script access allowed');
 
 class AN_Controller extends CI_Controller
 {
-	function __construct()
-	{
-		parent::__construct();
-	}
+    function __construct()
+    {
+        parent::__construct();
+    }
 }
 
 class AN_Public extends CI_Controller
 {
-	public $menuUjian = 1;
+    public $menuUjian = 1;
 
-	function __construct()
-	{
-		parent::__construct();
-		$data['meta_logo'] = get_pengaturan('meta_logo', '007');
-	}
+    function __construct()
+    {
+        parent::__construct();
+        $data['meta_logo'] = get_pengaturan('meta_logo', '007');
+    }
 
-	function meta_public()
-	{
-		return [1, 2, 3, 4, 5];
-	}
+    function meta_public()
+    {
+        return [1, 2, 3, 4, 5];
+    }
 }
 
 class AN_Webadminpanel extends CI_Controller
 {
-	public $dataLabel;
-	public $aksesc = array();
-	public $log_form = 'log_history';
+    public $dataLabel;
+    public $aksesc = array();
+    public $log_form = 'log_history';
 
-	function __construct($idformini = "dashboard")
-	{
-		parent::__construct();
-		$this->dataLabel = dtLabels();
+    function __construct($idformini = "dashboard")
+    {
+        parent::__construct();
+        $this->dataLabel = dtLabels();
 
-		$aksesPetugas = ['thisFrmDashboard', 'thisFrmJabatan', 'thisFrmAgenda', 'thisFrmBiodata'];
-		$aksesSuperdmin = ['dashboard', 'thisFrmBiodata', 'thisFrmLembaga', 'thisFrmJabatan', 'thisFrmDashboard', 'thisFrmAkses', 'thisFrmAgenda'];
+        $aksesPetugas = ['thisFrmDashboard', 'thisFrmJabatan', 'thisFrmAgenda', 'thisFrmBiodata'];
+        $aksesSuperdmin = ['dashboard', 'thisFrmBiodata', 'thisFrmLembaga', 'thisFrmJabatan', 'thisFrmDashboard', 'thisFrmAkses', 'thisFrmAgenda'];
 
-		$sessionId = $this->session->userdata('session_id');
-		if ($sessionId == null) {
-			redirect('admin/logout');
-			exit();
-		}
+        $sessionId = $this->session->userdata('session_id');
+        if ($sessionId == null) {
+            redirect('admin/logout');
+            exit();
+        }
 
-		$sessionLevel = $this->session->userdata('session_level');
-		if ($sessionLevel == 'petugas') {
-			if (!in_array($idformini, $aksesPetugas)) {
-				redirect('admin/dashboard');
-				exit();
-			}
-		}
-		$this->cekIdAkses($sessionId);
-		$data['labels'] = $this->dataLabel;
-		$this->load->view('headerv', $data, true);
-	}
+        $sessionLevel = $this->session->userdata('session_level');
+        if ($sessionLevel == 'petugas') {
+            if (!in_array($idformini, $aksesPetugas)) {
+                redirect('admin/dashboard');
+                exit();
+            }
+        }
+        $this->cekIdAkses($sessionId);
+        $data['labels'] = $this->dataLabel;
+        $this->load->view('headerv', $data, true);
+    }
 
-	public function cekHakakses($thisFrm, $jenis, $url = 'admin/dashboard')
-	{
-		$dtHakakses = [
-			"petugas" => [
-				"thisFrmJabatan" => [
-					"create" => 1,
-					"read" => 1,
-					"update" => 1,
-					"delete" => 1,
-					"print" => 1,
-					"public" => 0,
-				],
-			],
-			"superadmin" => [
-				"thisFrmJabatan" => [
-					"create" => 1,
-					"read" => 1,
-					"update" => 1,
-					"delete" => 1,
-					"print" => 1,
-					"public" => 0,
-				],
-			],
-		];
-		$level = $this->session->userdata('session_level');
-		if (!$dtHakakses[$level][$thisFrm][$jenis]) {
-			$this->session->set_flashdata('notifikasi', jsHandlerCustom("Anda tidak memiliki akses $jenis data $thisFrm", false));
-			redirect($url);
-			exit();
-		}
-	}
+    public function cekHakakses($thisFrm, $jenis, $url = 'admin/dashboard')
+    {
+        $dtHakakses = [
+            "petugas" => [
+                "thisFrmJabatan" => [
+                    "create" => 1,
+                    "read" => 1,
+                    "update" => 1,
+                    "delete" => 1,
+                    "print" => 1,
+                    "public" => 0,
+                ],
+            ],
+            "super admin" => [
+                "thisFrmJabatan" => [
+                    "create" => 1,
+                    "read" => 1,
+                    "update" => 1,
+                    "delete" => 1,
+                    "print" => 1,
+                    "public" => 0,
+                ],
+            ],
+        ];
+        $level = $this->session->userdata('session_level');
+        if (!$dtHakakses[$level][$thisFrm][$jenis]) {
+            $this->session->set_flashdata('notifikasi', jsHandlerCustom("Anda tidak memiliki akses $jenis data $thisFrm", false));
+            redirect($url);
+            exit();
+        }
+    }
 
-	private function cekIdAkses($id)
-	{
-		$CI = self::get_instance();
-		$sql = "SELECT * FROM akses WHERE id='$id'";
-		$cek = $this->db->query($sql);
-		$cek = $cek->result_array();
-		if (!$cek) {
-			session_destroy();
-			if ($this->input->get('__') !== null) {
-				handlerFilter("Autentikasi Gagal. Login Ulang ya....", 'custom', 'json');
-			} else {
-				redirect('admin/login');
-				exit();
-			}
-		}
-		return true;
-	}
+    private function cekIdAkses($id)
+    {
+        $CI = self::get_instance();
+        $sql = "SELECT * FROM akses WHERE id='$id'";
+        $cek = $this->db->query($sql);
+        $cek = $cek->result_array();
+        if (!$cek) {
+            session_destroy();
+            if ($this->input->get('__') !== null) {
+                handlerFilter("Autentikasi Gagal. Login Ulang ya....", 'custom', 'json');
+            } else {
+                redirect('admin/login');
+                exit();
+            }
+        }
+        return true;
+    }
 
-	public function getLembaga($id = '')
-	{
-		$dtLembaga = $this->Mlembaga->getData($id);
+    public function getLembaga($id = '')
+    {
+        $dtLembaga = $this->Mlembaga->getData($id);
 
-		$hLembaga = "";
-		foreach ($dtLembaga as $l) {
-			$chec = '';
-			if ($id == $l['id']) {
-				$chec = 'selected';
-			}
-			$hLembaga .= "<option $chec value=\"" . $l['id'] . "\">" . $l['nama'] . "</option>";
-		}
-		return $hLembaga;
-	}
+        $hLembaga = "";
+        foreach ($dtLembaga as $l) {
+            $chec = '';
+            if ($id == $l['id']) {
+                $chec = 'selected';
+            }
+            $hLembaga .= "<option $chec value=\"" . $l['id'] . "\">" . $l['nama'] . "</option>";
+        }
+        return $hLembaga;
+    }
 
-	public function getBiodata($idLembaga = '', $jenis = '', $idBiodata = '')
-	{
-		$dtTabel = $this->Mbiodata->getDataRelasi($idLembaga);
+    public function getBiodata($idLembaga = '', $jenis = '', $idBiodata = '')
+    {
+        $dtTabel = $this->Mbiodata->getDataRelasi($idLembaga);
 
-		$h = "";
-		if ($jenis == 'select') {
-			foreach ($dtTabel as $l) {
-				$chec = '';
-				if ($idBiodata == $l['id']) {
-					$chec = 'selected';
-				}
-				$h .= "<option $chec value=\"" . $l['id'] . "\">$l[nama] __ $l[nama_jabatan]</option>";
-			}
-		} else {
-		}
+        $h = "";
+        if ($jenis == 'select') {
+            foreach ($dtTabel as $l) {
+                $chec = '';
+                if ($idBiodata == $l['id']) {
+                    $chec = 'selected';
+                }
+                $h .= "<option $chec value=\"" . $l['id'] . "\">$l[nama] __ $l[nama_jabatan]</option>";
+            }
+        } else {
+        }
 
-		return $h;
-	}
+        return $h;
+    }
 
-	public function getJabatan($id = '')
-	{
-		$dtJabatan = $this->Mjabatan->getData($id);
+    public function getJabatan($id = '')
+    {
+        $dtJabatan = $this->Mjabatan->getData($id);
 
-		$hJabatan = "";
-		foreach ($dtJabatan as $l) {
-			$chec = '';
-			if ($id == $l['id']) {
-				$chec = 'selected';
-			}
-			$hJabatan .= "<option $chec value=\"" . $l['id'] . "\">" . $l['nama'] . "</option>";
-		}
-		return $hJabatan;
-	}
+        $hJabatan = "";
+        foreach ($dtJabatan as $l) {
+            $chec = '';
+            if ($id == $l['id']) {
+                $chec = 'selected';
+            }
+            $hJabatan .= "<option $chec value=\"" . $l['id'] . "\">" . $l['nama'] . "</option>";
+        }
+        return $hJabatan;
+    }
 }
