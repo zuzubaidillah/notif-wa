@@ -1,15 +1,26 @@
-# top-most EditorConfig file
-root = true
-
-# Unix-style newlines with a newline ending every file
-[*]
-end_of_line = lf
-insert_final_newline = true
-
-# Matches multiple files with brace expansion notation
-# Set default charset
 [*]
 charset = utf-8
-
-# Tab indentation (no size specified)
-indent_style = tab
+end_of_line = lf
+indent_size = 4
+indent_style = space
+insert_final_newline = true
+max_line_length = 120
+tab_width = 4
+any_block_comment_at_first_column = false
+trim_trailing_whitespace = true
+ij_continuation_indent_size = 4
+ij_formatter_off_tag = @formatter:off
+ij_formatter_on_tag = @formatter:on
+ij_formatter_tags_enabled = true
+ij_smart_tabs = false
+ij_visual_guides = none
+ij_wrap_on_typing = false
+ij_any_line_comment_at_first_column = false
+ij_php_line_comment_at_first_column = false
+ij_any_keep_first_column_comment = false
+ij_php_keep_first_column_comment = false
+ij_any_block_comment_at_first_column = false
+ij_html_block_comment_at_first_column = false
+ij_any_block_comment_add_space = false
+ij_javascript_keep_first_column_comment = false
+ij_typescript_keep_first_column_comment = false
