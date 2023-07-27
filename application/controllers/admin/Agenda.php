@@ -4,188 +4,229 @@ date_default_timezone_set("Asia/Jakarta");
 
 class Agenda extends AN_Webadminpanel
 {
-	// metode yang pertama kali dijalankan
+    // metode yang pertama kali dijalankan
 
-	public function __construct()
-	{
-		parent::__construct('thisFrmAgenda');
-	}
+    public function __construct()
+    {
+        parent::__construct('thisFrmAgenda');
+    }
 
-	public function index()
-	{
-		$data['head_title'] = "Data Agenda";
-		$data['body_label_content'] = "Data Agenda";
-		$data['rootss'] = base_url('admin/agenda/');
-		$data['dtTabel'] = $this->Magenda->getDataRelasi();
+    public function index()
+    {
+        $data['head_title'] = "Data Agenda";
+        $data['body_label_content'] = "Data Agenda";
+        $data['rootss'] = base_url('admin/agenda/');
+        $agenda = new Magenda();
+        $data['dtTabel'] = $agenda->getDataRelasi();
 
-		$this->load->view('headerv', $data);
-		$this->load->view('admin/menuv');
-		$this->load->view('admin/agenda/readv');
-		$this->load->view('footerv');
-	}
+        $this->load->view('headerv', $data);
+        $this->load->view('admin/menuv');
+        $this->load->view('admin/agenda/readv');
+        $this->load->view('footerv');
+    }
 
-	public function add()
-	{
-		$data['head_title'] = "Tambah Agenda";
-		$data['body_label_content'] = "Jabatan";
-		$data['rootss'] = base_url('admin/agenda/');
+    private function validateDate($date, $format = 'Y-m-d')
+    {
+        $d = DateTime::createFromFormat($format, $date);
+        return $d && $d->format($format) === $date;
+    }
 
-		$id_lembaga = '';
-		if ($this->session->userdata('session_level') == 'petugas') {
-			$id_lembaga = $this->Mbiodata->cekId(ambil_user())[0]['id_lembaga'];
-			$data['dtBiodata'] = AN_Webadminpanel::getBiodata($id_lembaga, 'select');
-		}
-		$data['dtLembaga'] = AN_Webadminpanel::getLembaga($id_lembaga);
+    private function dateDiffInDays($date1, $date2)
+    {
+        $diff = strtotime($date2) - strtotime($date1);
+        return abs(round($diff / (60 * 60 * 24)));
+    }
 
-		$this->load->view('headerv', $data);
-		$this->load->view('admin/menuv');
-		$this->load->view('admin/agenda/addv');
-		$this->load->view('footerv');
-	}
+    public function export()
+    {
+        $awal = $_GET['awal'] ?? '';
+        $akhir = $_GET['akhir'] ?? '';
+        if (empty($awal) || empty($akhir)) {
+            $this->session->set_flashdata('notifikasi', jsHandlerCustom("Tanggal harus diisi", false));
+            redirect('admin/agenda');
+        } elseif (!$this->validateDate($awal) || !$this->validateDate($akhir)) {
+            $this->session->set_flashdata('notifikasi', jsHandlerCustom("Tanggal format harus sesuai tahun-bulan-tanggal", false));
+            redirect('admin/agenda');
+        } elseif ($this->dateDiffInDays($awal, $akhir) > 300) {
+            $this->session->set_flashdata('notifikasi', jsHandlerCustom("Pastikan Range Tanggal 30hari", false));
+            redirect('admin/agenda');
+        }
+        $agenda = new Magenda();
+        $data['data'] = $agenda->getDataRelasi('', ['awal' => $awal, 'akhir' => $akhir]);
+        if (!count($data['data'])) {
+            $this->session->set_flashdata('notifikasi', jsHandlerCustom("range tanggal $awal - $akhir Data tidak ditemukan", false));
+            redirect('admin/agenda');
+        }
+        $data['head_title'] = "Data Agenda";
+        $data['body_label_content'] = "Data Agenda";
+        $data['rootss'] = base_url('admin/agenda/');
+        $data['dtTabel'] = $this->Magenda->getDataRelasi();
 
-	public function update($getId = "0")
-	{
-		$data['head_title'] = "Update Agenda";
-		$data['body_label_content'] = "Agenda";
-		$data['rootss'] = base_url('admin/agenda/');
+        $this->load->view('admin/agenda/exportv', $data);
+    }
 
-		// cek id user
-		$cek = $this->Magenda->cekId($getId);
-		if ($getId == "0" || count($cek) == 0) {
-			$this->session->set_flashdata('notifikasi', jsHandlerIdKosong());
-			redirect('admin/agenda');
-			exit();
-		}
+    public function add()
+    {
+        $data['head_title'] = "Tambah Agenda";
+        $data['body_label_content'] = "Jabatan";
+        $data['rootss'] = base_url('admin/agenda/');
 
-		$id_lembaga = '';
-		if ($this->session->userdata('session_level') == 'petugas') {
-			$id_lembaga = $this->Mbiodata->cekId(ambil_user())[0]['id_lembaga'];
-		} else {
-			$id_lembaga = $this->Mbiodata->cekId($cek[0]['id_biodata'])[0]['id_lembaga'];
-		}
-		$data['dtBiodata'] = AN_Webadminpanel::getBiodata($id_lembaga, 'select', $cek[0]['id_biodata']);
+        $id_lembaga = '';
+        if ($this->session->userdata('session_level') == 'petugas') {
+            $id_lembaga = $this->Mbiodata->cekId(ambil_user())[0]['id_lembaga'];
+            $data['dtBiodata'] = AN_Webadminpanel::getBiodata($id_lembaga, 'select');
+        }
+        $data['dtLembaga'] = AN_Webadminpanel::getLembaga($id_lembaga);
 
-		$data['dtLembaga'] = AN_Webadminpanel::getLembaga($id_lembaga);
-		$data['id'] = $cek[0]['id'];
-		$data['dari'] = $cek[0]['dari'];
-		$data['deskripsi'] = $cek[0]['deskripsi'];
-		$data['waktu'] = date("Y-m-d", strtotime($cek[0]['waktu']));
-		$data['jam'] = date("H:i", strtotime($cek[0]['waktu']));
-		$data['durasi'] = $cek[0]['menit_sebelum_notif'];
-		$data['notifKe'] = $cek[0]['notif_ke'];
-		$data['id_biodata'] = $cek[0]['id_biodata'];
+        $this->load->view('headerv', $data);
+        $this->load->view('admin/menuv');
+        $this->load->view('admin/agenda/addv');
+        $this->load->view('footerv');
+    }
 
-		$data['hPu'] = ($cek[0]['jenis_agenda'] == 'private' ? '' : 'checked');
-		$data['hPr'] = ($cek[0]['jenis_agenda'] == 'private' ? 'checked' : '');
+    public function update($getId = "0")
+    {
+        $data['head_title'] = "Update Agenda";
+        $data['body_label_content'] = "Agenda";
+        $data['rootss'] = base_url('admin/agenda/');
 
-		$this->load->view('headerv', $data);
-		$this->load->view('admin/menuv');
-		$this->load->view('admin/agenda/updatev');
-		$this->load->view('footerv');
-	}
+        // cek id user
+        $cek = $this->Magenda->cekId($getId);
+        if ($getId == "0" || count($cek) == 0) {
+            $this->session->set_flashdata('notifikasi', jsHandlerIdKosong());
+            redirect('admin/agenda');
+            exit();
+        }
 
-	public function proses_add()
-	{
-		$lembaga = htmlspecialchars($this->input->post('lembaga'), ENT_QUOTES);
-		$biodata = htmlspecialchars($this->input->post('biodata'), ENT_QUOTES);
-		$dari = htmlspecialchars($this->input->post('dari'), ENT_QUOTES);
-		$jenis = htmlspecialchars($this->input->post('jenis'), ENT_QUOTES);
-		$tgl = htmlspecialchars($this->input->post('tgl'), ENT_QUOTES);
-		$durasi = htmlspecialchars($this->input->post('durasi'), ENT_QUOTES);
-		$keterangan = htmlspecialchars($this->input->post('keterangan'), ENT_QUOTES);
-		$jam = htmlspecialchars($this->input->post('jam'), ENT_QUOTES);
+        $id_lembaga = '';
+        if ($this->session->userdata('session_level') == 'petugas') {
+            $id_lembaga = $this->Mbiodata->cekId(ambil_user())[0]['id_lembaga'];
+        } else {
+            $id_lembaga = $this->Mbiodata->cekId($cek[0]['id_biodata'])[0]['id_lembaga'];
+        }
+        $data['dtBiodata'] = AN_Webadminpanel::getBiodata($id_lembaga, 'select', $cek[0]['id_biodata']);
 
-		// cek username tidak boleh sama
-		$id = buat_id('AGE', 'agenda');
+        $data['dtLembaga'] = AN_Webadminpanel::getLembaga($id_lembaga);
+        $data['id'] = $cek[0]['id'];
+        $data['dari'] = $cek[0]['dari'];
+        $data['deskripsi'] = $cek[0]['deskripsi'];
+        $data['waktu'] = date("Y-m-d", strtotime($cek[0]['waktu']));
+        $data['jam'] = date("H:i", strtotime($cek[0]['waktu']));
+        $data['durasi'] = $cek[0]['menit_sebelum_notif'];
+        $data['notifKe'] = $cek[0]['notif_ke'];
+        $data['id_biodata'] = $cek[0]['id_biodata'];
 
-		$dataSimpan = [
-			"id" => $id,
-			"id_biodata" => $biodata,
-			"dari" => $dari,
-			"jenis_agenda" => $jenis,
-			"waktu" => $tgl . " " . $jam,
-			"menit_sebelum_notif" => $durasi,
-			"deskripsi" => $keterangan,
-			"notif_ke" => 0,
-		];
-		if ($this->Makses->add('agenda', $dataSimpan)) {
-			$this->session->set_flashdata('notifikasi', jsHandler('c'));
-			redirect('admin/agenda');
-			exit();
-		}
-		$this->session->set_flashdata('notifikasi', jsHandler('c', false));
-		redirect('admin/agenda/add');
-	}
+        $data['hPu'] = ($cek[0]['jenis_agenda'] == 'private' ? '' : 'checked');
+        $data['hPr'] = ($cek[0]['jenis_agenda'] == 'private' ? 'checked' : '');
 
-	public function proses_update($id = '0')
-	{
-		$id = $id;
-		$biodata = htmlspecialchars($this->input->post('biodata'), ENT_QUOTES);
-		$dari = htmlspecialchars($this->input->post('dari'), ENT_QUOTES);
-		$jenis = htmlspecialchars($this->input->post('jenis'), ENT_QUOTES);
-		$tgl = htmlspecialchars($this->input->post('tgl'), ENT_QUOTES);
-		$durasi = htmlspecialchars($this->input->post('durasi'), ENT_QUOTES);
-		$keterangan = htmlspecialchars($this->input->post('keterangan'), ENT_QUOTES);
-		$jam = htmlspecialchars($this->input->post('jam'), ENT_QUOTES);
+        $this->load->view('headerv', $data);
+        $this->load->view('admin/menuv');
+        $this->load->view('admin/agenda/updatev');
+        $this->load->view('footerv');
+    }
 
-		$cekIdAgenda = $this->Magenda->cekId($id);
-		if (count($cekIdAgenda) == 0) {
-			$this->session->set_flashdata('notifikasi', jsHandlerIdKosong());
-			redirect('admin/agenda');
-			exit();
-		}
+    public function proses_add()
+    {
+        $lembaga = htmlspecialchars($this->input->post('lembaga'), ENT_QUOTES);
+        $biodata = htmlspecialchars($this->input->post('biodata'), ENT_QUOTES);
+        $dari = htmlspecialchars($this->input->post('dari'), ENT_QUOTES);
+        $jenis = htmlspecialchars($this->input->post('jenis'), ENT_QUOTES);
+        $tgl = htmlspecialchars($this->input->post('tgl'), ENT_QUOTES);
+        $durasi = htmlspecialchars($this->input->post('durasi'), ENT_QUOTES);
+        $keterangan = htmlspecialchars($this->input->post('keterangan'), ENT_QUOTES);
+        $jam = htmlspecialchars($this->input->post('jam'), ENT_QUOTES);
 
-		$dataSimpan = [
-			"id_biodata" => $biodata,
-			"dari" => $dari,
-			"jenis_agenda" => $jenis,
-			"waktu" => $tgl . " " . $jam,
-			"menit_sebelum_notif" => $durasi,
-			"deskripsi" => $keterangan,
-		];
-		$h = $this->Makses->update('agenda', $dataSimpan, 'id', $id);
-		if ($h) {
-			$this->session->set_flashdata('notifikasi', jsHandler('u'));
-			redirect('admin/agenda');
-			exit();
-		}
-		$this->session->set_flashdata('notifikasi', jsHandler('u', false));
-		redirect('admin/agenda/update/' . $id);
-	}
+        // cek username tidak boleh sama
+        $id = buat_id('AGE', 'agenda');
 
-	public function proses_delete($getId = "0")
-	{
-		// cek id user
-		$cek = $this->Magenda->cekId($getId);
-		if ($getId == "0" || count($cek) == 0) {
-			$this->session->set_flashdata('notifikasi', jsHandlerIdKosong());
-			redirect('admin/agenda');
-			exit();
-		}
+        $dataSimpan = [
+            "id" => $id,
+            "id_biodata" => $biodata,
+            "dari" => $dari,
+            "jenis_agenda" => $jenis,
+            "waktu" => $tgl . " " . $jam,
+            "menit_sebelum_notif" => $durasi,
+            "deskripsi" => $keterangan,
+            "notif_ke" => 0,
+        ];
+        if ($this->Makses->add('agenda', $dataSimpan)) {
+            $this->session->set_flashdata('notifikasi', jsHandler('c'));
+            redirect('admin/agenda');
+            exit();
+        }
+        $this->session->set_flashdata('notifikasi', jsHandler('c', false));
+        redirect('admin/agenda/add');
+    }
 
-		$h = $this->Magenda->delete($getId);
-		if ($h) {
-			$this->session->set_flashdata('notifikasi', jsHandler('d'));
-			redirect('admin/agenda');
-			exit();
-		}
+    public function proses_update($id = '0')
+    {
+        $id = $id;
+        $biodata = htmlspecialchars($this->input->post('biodata'), ENT_QUOTES);
+        $dari = htmlspecialchars($this->input->post('dari'), ENT_QUOTES);
+        $jenis = htmlspecialchars($this->input->post('jenis'), ENT_QUOTES);
+        $tgl = htmlspecialchars($this->input->post('tgl'), ENT_QUOTES);
+        $durasi = htmlspecialchars($this->input->post('durasi'), ENT_QUOTES);
+        $keterangan = htmlspecialchars($this->input->post('keterangan'), ENT_QUOTES);
+        $jam = htmlspecialchars($this->input->post('jam'), ENT_QUOTES);
 
-		$this->session->set_flashdata('notifikasi', jsHandler('d', false));
-		redirect('admin/agenda');
-	}
+        $cekIdAgenda = $this->Magenda->cekId($id);
+        if (count($cekIdAgenda) == 0) {
+            $this->session->set_flashdata('notifikasi', jsHandlerIdKosong());
+            redirect('admin/agenda');
+            exit();
+        }
 
-	public function biodata_filter()
-	{
-		$idLembaga = $this->input->post('lembaga');
-		$cek = $this->Mlembaga->cekId($idLembaga);
-		if (count($cek) == 0) {
-			$res = res_error(null, 'gagal', 'id tidak ditemukan');
-			http_response_code($res['code']);
-			exit();
-		}
-		$hasilBiodata = AN_Webadminpanel::getBiodata($idLembaga, 'select');
-		$res = res_success($hasilBiodata, 'berhasil', 'ditemukan');
-		http_response_code($res['code']);
-		echo json_encode($res);
-	}
+        $dataSimpan = [
+            "id_biodata" => $biodata,
+            "dari" => $dari,
+            "jenis_agenda" => $jenis,
+            "waktu" => $tgl . " " . $jam,
+            "menit_sebelum_notif" => $durasi,
+            "deskripsi" => $keterangan,
+        ];
+        $h = $this->Makses->update('agenda', $dataSimpan, 'id', $id);
+        if ($h) {
+            $this->session->set_flashdata('notifikasi', jsHandler('u'));
+            redirect('admin/agenda');
+            exit();
+        }
+        $this->session->set_flashdata('notifikasi', jsHandler('u', false));
+        redirect('admin/agenda/update/' . $id);
+    }
+
+    public function proses_delete($getId = "0")
+    {
+        // cek id user
+        $cek = $this->Magenda->cekId($getId);
+        if ($getId == "0" || count($cek) == 0) {
+            $this->session->set_flashdata('notifikasi', jsHandlerIdKosong());
+            redirect('admin/agenda');
+            exit();
+        }
+
+        $h = $this->Magenda->delete($getId);
+        if ($h) {
+            $this->session->set_flashdata('notifikasi', jsHandler('d'));
+            redirect('admin/agenda');
+            exit();
+        }
+
+        $this->session->set_flashdata('notifikasi', jsHandler('d', false));
+        redirect('admin/agenda');
+    }
+
+    public function biodata_filter()
+    {
+        $idLembaga = $this->input->post('lembaga');
+        $cek = $this->Mlembaga->cekId($idLembaga);
+        if (count($cek) == 0) {
+            $res = res_error(null, 'gagal', 'id tidak ditemukan');
+            http_response_code($res['code']);
+            exit();
+        }
+        $hasilBiodata = AN_Webadminpanel::getBiodata($idLembaga, 'select');
+        $res = res_success($hasilBiodata, 'berhasil', 'ditemukan');
+        http_response_code($res['code']);
+        echo json_encode($res);
+    }
 }

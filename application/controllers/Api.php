@@ -62,10 +62,6 @@ PESAN;
             $row[0] = $resApi[0];
             $row[1] = $resApi[1];
             if ($resApi[1] == 200) {
-                // if ($getId == '') {
-                // } else {
-                // 	$jml = 0;
-                // }
                 $jml = $l['notif_ke'] + 1;
                 $update = [
                     "notif_ke" => $jml
