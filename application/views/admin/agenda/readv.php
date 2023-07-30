@@ -158,7 +158,16 @@
                         cancelButtonColor: '#d33',
                         confirmButtonText: 'Proses'
                     }).then((result) => {
-                        if (result.isConfirmed) window.location = url;
+                        if (result.isConfirmed) {
+                            $.get("<?=base_url('api/kirimwaidagendabroadcast')?>").done(function (data) {
+                                Swal.fire({
+                                    icon: data.icon,
+                                    title: data.message,
+                                    showConfirmButton: true,
+                                });
+                            });
+                        }
+                        ;
                     })
                 });
 

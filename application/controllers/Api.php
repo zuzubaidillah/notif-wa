@@ -14,30 +14,36 @@ class Api extends CI_Controller
         exit();
     }
 
-    public function cekAgenda($getId = '')
+    public function cekAgenda($getId = '', $jenisResponse = 'json')
     {
+        $Magenda = new Magenda();
         if ($getId == '') {
             $tgl = datetime_sendiri();
-            $cek = $this->Magenda->cekAgenda($tgl);
+            $cek = $Magenda->cekAgenda($tgl);
         } else {
-            $cek = $this->Magenda->getDataRelasi($getId);
+            $cek = $Magenda->getDataRelasi($getId);
         }
         if (count($cek) == 0) {
-            $res = res_error(null, 'Berhasil', 'Tidak Ditemukan Agenda');
-            http_response_code($res['code']);
-            echo json_encode($res);
-            exit();
+            if ($jenisResponse == 'json') {
+                $res = res_error(null, 'Berhasil', 'Tidak Ditemukan Agenda');
+                http_response_code($res['code']);
+                echo json_encode($res);
+                exit();
+            }
+            return ['data' => []];
         }
         $row = [];
         foreach ($cek as $l) {
-            if ($l['status'] < 0) {
-                if ($getId == '') {
-                    $row[] = 409;
-                    continue;
-                } else {
-                    $this->session->set_flashdata('notifikasi', jsHandlerCustom('Maaf Agenda Sudah Selesai.', false));
-                    redirect('admin/agenda/update/' . $getId);
-                    exit();
+            if ($jenisResponse == 'json') {
+                if ($l['status'] < 0) {
+                    if ($getId == '') {
+                        $row[] = 409;
+                        continue;
+                    } else {
+                        $this->session->set_flashdata('notifikasi', jsHandlerCustom('Maaf Agenda Sudah Selesai.', false));
+                        redirect('admin/agenda/update/' . $getId);
+                        exit();
+                    }
                 }
             }
             $tgl = tgl_indo($l['waktu']);
@@ -69,6 +75,9 @@ PESAN;
                 $this->Makses->update('agenda', $update, 'id', $l['id']);
             }
         }
+        if ($jenisResponse !== 'json') {
+            return ['data' => [$cek, $tgl, $row]];
+        }
         if ($getId == '') {
             $res = res_success([$cek, $tgl, $row], '', '');
             http_response_code($res['code']);
@@ -96,5 +105,37 @@ PESAN;
             redirect('admin/agenda/update/' . $id);
             exit();
         }
+    }
+
+    public function kirimwaidagendabroadcast()
+    {
+        $Magenda = new Magenda();
+        $data = $Magenda->cekAgendaBelumSelesai();
+        if (!count($data)) {
+            $res = res_error(null, 'Info', 'Data agenda yang menunggu tidak ditemukan');
+            http_response_code($res['code']);
+            echo json_encode($res);
+            exit();
+        }
+        $totalAgenda = sizeof($data);
+        $result = [];
+        foreach ($data as $item) {
+            $id = $item['id'];
+            $hasil = $this->cekAgenda($id, 'return');
+            if (count($hasil['data'])) {
+                $result[] = [
+                    "agenda" => $item['dari'],
+                    "message" => "Berhasil"
+                ];
+            } else {
+                $result[] = [
+                    "agenda" => $item['dari'],
+                    "message" => "Gagal"
+                ];
+            }
+        }
+        $res = res_success($result, 'Hasil', 'Berhasil');
+        http_response_code($res['code']);
+        echo json_encode($res);
     }
 }

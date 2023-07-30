@@ -153,4 +153,39 @@ class Magenda extends CI_Model
         $this->db->delete('agenda');
         return $this->db->affected_rows(); // 0 atau 1
     }
+
+    public function cekAgendaBelumSelesai()
+    {
+        $tgl = datetime_sendiri();
+        $sql = "SELECT
+		    age.*,
+		    bio.nama AS nama_pengguna,
+		    bio.no_telp AS nomor_wa,
+		    lem.nama AS nama_lembaga,
+		    (
+		        TIMESTAMPDIFF(
+		            HOUR,
+		            '$tgl',
+		            age.waktu
+		        )
+		    ) as status
+		FROM
+		    agenda age
+		INNER JOIN biodata bio ON
+		    age.id_biodata = bio.id
+		INNER JOIN lembaga lem ON
+		    bio.id_lembaga = lem.id
+		WHERE
+		    age.waktu >= '$tgl' AND (
+		        TIMESTAMPDIFF(
+		            HOUR,
+		            '$tgl',
+		            age.waktu
+		        )
+		    ) <= 240
+		ORDER BY
+		    `age`.`id_biodata` ASC limit 50;";
+        $query = $this->db->query($sql);
+        return $query->result_array();
+    }
 }
