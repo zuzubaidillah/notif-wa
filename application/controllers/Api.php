@@ -33,6 +33,7 @@ class Api extends CI_Controller
             return ['data' => []];
         }
         $row = [];
+        $resultWa = 0;
         foreach ($cek as $l) {
             if ($jenisResponse == 'json') {
                 if ($l['status'] < 0) {
@@ -72,11 +73,15 @@ PESAN;
                 $update = [
                     "notif_ke" => $jml
                 ];
+                $resultWa++;
                 $this->Makses->update('agenda', $update, 'id', $l['id']);
             }
         }
         if ($jenisResponse !== 'json') {
-            return ['data' => [$cek, $tgl, $row]];
+            if ($resultWa) {
+                return ['data' => [$cek, $tgl, $row]];
+            }
+            return ['data' => []];
         }
         if ($getId == '') {
             $res = res_success([$cek, $tgl, $row], '', '');
@@ -134,7 +139,14 @@ PESAN;
                 ];
             }
         }
-        $res = res_success($result, 'Hasil', 'Berhasil');
+        $resultString = '';
+        foreach ($result as $item) {
+            $resultString .= "agenda: " . $item['agenda'] . " (" . $item['message'] . ")\n ";
+        }
+
+        // Remove the trailing comma and space from the end of the string
+        $resultString = rtrim($resultString, ', ');
+        $res = res_custom($result, 'Hasil', $resultString, 200, 'info');
         http_response_code($res['code']);
         echo json_encode($res);
     }
